@@ -40,6 +40,7 @@ module OmniAuth
 
         hash[:raw_info] = raw_info unless skip_info?
         hash[:id_token] = access_token.token
+        hash[:session_id] = fetch_session_id # Add this line
         if !options[:skip_jwt] && !access_token.token.nil?
           hash[:id_info] = validated_token(access_token.token)
         end
@@ -54,6 +55,11 @@ module OmniAuth
           :expires_at => oauth2_access_token.expires_at,
           :refresh_token => oauth2_access_token.refresh_token
         })
+      end
+
+      def fetch_session_id
+        session_info = access_token.get('https://login.flashpoint.io/api/v1/sessions/me').parsed
+        session_info['id']
       end
 
       def raw_info
